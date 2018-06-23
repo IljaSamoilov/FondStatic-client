@@ -1,6 +1,30 @@
 <template>
   <div>
-    <p>{{results}}</p>
+    <table>
+      <tr>
+        <th>symbol</th>
+        <th>amount</th>
+        <th>purchase price</th>
+        <th>market price</th>
+        <th>change</th>
+        <th>change today</th>
+        <th>profit</th>
+        <th>total market price</th>
+        <th>part</th>
+      </tr>
+      <tr v-for="result in results">
+        <th>{{result.symbol}}</th>
+        <th>{{result.amount}}</th>
+        <th>{{result.exemplarpurchaseprice}}</th>
+        <th>{{result.exemplarmarketprice}}</th>
+        <th>{{result.change}}</th>
+        <th>{{result.changetoday}}</th>
+        <th>{{result.profit}}</th>
+        <th>{{result.totalmarketprice}}</th>
+        <th>{{result.part}}</th>
+      </tr>
+    </table>
+    <p>{{results[0]}}</p>
     <p>hello</p>
   </div>
 </template>
@@ -20,16 +44,16 @@ export default {
     await axios.get('https://cors-anywhere.herokuapp.com/https://fond-data.herokuapp.com/getAllData',
       {
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Conthol-Allow-Origin': '*',
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          'Access-Conthol-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         }
       })
       .then(response => {
-        this.results = response
+        this.results = response.data
       })
       .catch(error => {
-        console.log(error)
+        console.log(error.stack)
       })
   },
   methods: {
