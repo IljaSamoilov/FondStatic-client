@@ -23,14 +23,16 @@
             <th>{{result.amount}}</th>
             <th>{{result.exemplarpurchaseprice}}</th>
             <th>{{result.exemplarmarketprice}}</th>
-            <th v-bind:class="isPositive(result.change) ? 'positive' : 'negative'">{{result.change}}</th>
-            <th v-bind:class="isPositive(result.changetoday) ? 'positive' : 'negative'">{{result.changetoday}}</th>
+            <th v-bind:class="isPositive(result.change) ? 'positive' : 'negative'">{{result.change}}%</th>
+            <th v-bind:class="isPositive(result.changetoday) ? 'positive' : 'negative'">{{result.changetoday}}%</th>
             <th v-bind:class="isPositive(result.profit) ? 'positive' : 'negative'">{{result.profit}}</th>
             <th>{{result.totalmarketprice}}</th>
             <!--<th>{{result.part}}</th>-->
           </tr>
           </tbody>
         </table>
+        <p>Kasum: <span>{{totalprofit.toFixed(2)}}</span></p>
+        <p>Varad kokku: <span>{{sum.toFixed(2)}}</span></p>
       </div>
     </div>
 
@@ -50,7 +52,9 @@
     data() {
       return {
         results: [],
-        symbols: []
+        symbols: [],
+        totalprofit: 0,
+        sum:0
       }
     },
     async created() {
@@ -80,9 +84,8 @@
         })
           .then(response => {
             this.results.push(response.data)
-            // console.log('done')
-            console.log(response.data)
-            // return response.data
+            this.totalprofit += response.data.profit;
+            this.sum += response.data.totalmarketprice;
           })
           .catch(error => {
             console.log(error)
