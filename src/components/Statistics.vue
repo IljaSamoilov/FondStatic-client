@@ -42,80 +42,80 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  // require('materialize-css/dist/css/materialize.css')
-  require('materialize-css')
-  require('bootstrap')
+import axios from 'axios'
+// require('materialize-css/dist/css/materialize.css')
+require('materialize-css')
+require('bootstrap')
 
-  export default {
-    name: 'Statistics',
-    data() {
-      return {
-        results: [],
-        symbols: [],
-        totalprofit: 0,
-        sum:0
-      }
-    },
-    async created() {
-      this.fetchSymbols();
-      // await this.fetchData()
-      // await axios.get('https://cors-anywhere.herokuapp.com/https://fond-data.herokuapp.com/getAllData',
-      //   {
-      //     headers: {
-      //       'Access-Conthol-Allow-Origin': '*',
-      //       'Content-Type': 'application/json',
-      //       'Access-Conthol-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-      //     }
-      //   })
-      //   .then(response => {
-      //     this.results = response.data
-      //   })
-      //   .catch(error => {
-      //     console.log(error.stack)
-      //   })
-    },
-    methods: {
-      async fetchData(symbol) {
-        await axios.get('https://cors-anywhere.herokuapp.com/https://fond-data.herokuapp.com/getLastForSymbol', {
-          params: {
-            symbol: symbol
-          }
+export default {
+  name: 'Statistics',
+  data () {
+    return {
+      results: [],
+      symbols: [],
+      totalprofit: 0,
+      sum: 0
+    }
+  },
+  async created () {
+    this.fetchSymbols()
+    // await this.fetchData()
+    // await axios.get('https://cors-anywhere.herokuapp.com/https://fond-data.herokuapp.com/getAllData',
+    //   {
+    //     headers: {
+    //       'Access-Conthol-Allow-Origin': '*',
+    //       'Content-Type': 'application/json',
+    //       'Access-Conthol-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+    //     }
+    //   })
+    //   .then(response => {
+    //     this.results = response.data
+    //   })
+    //   .catch(error => {
+    //     console.log(error.stack)
+    //   })
+  },
+  methods: {
+    async fetchData (symbol) {
+      await axios.get('https://fond-data.herokuapp.com/getLastForSymbol', {
+        params: {
+          symbol: symbol
+        }
+      })
+        .then(response => {
+          this.results.push(response.data)
+          this.totalprofit += response.data.profit
+          this.sum += response.data.totalmarketprice
         })
-          .then(response => {
-            this.results.push(response.data)
-            this.totalprofit += response.data.profit;
-            this.sum += response.data.totalmarketprice;
-          })
-          .catch(error => {
-            console.log(error)
-          })
-      },
-      /** setData (data) {
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    /** setData (data) {
       this.results = data
       console.log(data)
     } **/
 
-      isPositive(number) {
-        return number > 0;
-      },
+    isPositive (number) {
+      return number > 0
+    },
 
-      async fetchSymbols() {
-        await axios.get('https://cors-anywhere.herokuapp.com/https://fond-data.herokuapp.com/getSymbols')
-          .then(response => {
-            this.symbols = response.data;
-            for (var i = 0; i < this.symbols.length; i++) {
-              this.fetchData(this.symbols[i])
-            }
-            // this.symbols.forEach(function(symbol) {
-            //   console.log(symbol)
-            //   this.$parent.fetchData(symbol)
-            // })
-          })
-      }
+    async fetchSymbols () {
+      await axios.get('https://fond-data.herokuapp.com/getSymbols')
+        .then(response => {
+          this.symbols = response.data
+          for (var i = 0; i < this.symbols.length; i++) {
+            this.fetchData(this.symbols[i])
+          }
+          // this.symbols.forEach(function(symbol) {
+          //   console.log(symbol)
+          //   this.$parent.fetchData(symbol)
+          // })
+        })
     }
-
   }
+
+}
 </script>
 
 <style>
