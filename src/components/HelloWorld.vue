@@ -1,5 +1,7 @@
 <template>
   <div class="hello">
+    <router-link :to="{ name: 'Statistics' }">Statistics</router-link>
+
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
