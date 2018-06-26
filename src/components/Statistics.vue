@@ -14,12 +14,13 @@
             <th>MUUTUS TÄNA</th>
             <th>KASUM</th>
             <th>TURUVÄÄRTUS</th>
+            <th>VIIMANE UUENDUS</th>
             <!--<th >OSAKAAL</th>-->
           </tr>
           </thead>
           <tbody>
           <tr v-for="result in results">
-            <th>{{result.symbol}}</th>
+            <th><a href="#" v-on:click="clickSymbol(result.symbol)">{{result.symbol}}</a></th>
             <th>{{result.amount}}</th>
             <th>{{result.exemplarpurchaseprice}}</th>
             <th>{{result.exemplarmarketprice}}</th>
@@ -27,15 +28,18 @@
             <th v-bind:class="isPositive(result.changetoday) ? 'positive' : 'negative'">{{result.changetoday}}%</th>
             <th v-bind:class="isPositive(result.profit) ? 'positive' : 'negative'">{{result.profit}}</th>
             <th>{{result.totalmarketprice}}</th>
+            <th>{{result.timestamp}}</th>
             <!--<th>{{result.part}}</th>-->
           </tr>
           </tbody>
         </table>
-        <p>Kasum: <span>{{totalprofit.toFixed(2)}}</span></p>
-        <p>Varad kokku: <span>{{sum.toFixed(2)}}</span></p>
+        <span class="right flow-text">Kasum: <span>{{totalprofit.toFixed(2)}}</span></span>
+        <!--<br/>-->
+        <br/>
+        <span class="right flow-text">Varad kokku: <span>{{sum.toFixed(2)}}</span></span>
       </div>
     </div>
-
+    <charts :symbol="clickedSymbol"></charts>
     <!--<p>{{results[0]}}</p>-->
     <!--<p>hello</p>-->
   </div>
@@ -43,18 +47,23 @@
 
 <script>
 import axios from 'axios'
+import Charts from './Charts'
 // require('materialize-css/dist/css/materialize.css')
 require('materialize-css')
 require('bootstrap')
 
 export default {
   name: 'Statistics',
+  components: {
+    Charts
+  },
   data () {
     return {
       results: [],
       symbols: [],
       totalprofit: 0,
-      sum: 0
+      sum: 0,
+      clickedSymbol: ''
     }
   },
   async created () {
@@ -112,6 +121,9 @@ export default {
           //   this.$parent.fetchData(symbol)
           // })
         })
+    },
+    clickSymbol (symbol) {
+      this.clickedSymbol = symbol
     }
   }
 
@@ -122,24 +134,16 @@ export default {
   @import "materialize-css/dist/css/materialize.css";
 </style>
 <style scoped>
-  /*th{*/
-  /*padding: 10px 0px 5px 0px;*/
-  /*}*/
-
-  /*table {*/
-  /*margin: 0;*/
-  /*padding: 0;*/
-  /*border: 0;*/
-  /*font-size: 100%;*/
-  /*}*/
-  /*.small-font {*/
-  /*font-size: 11px;*/
-  /*}*/
+  th {
+    text-align: right;
+  }
 
   .negative {
     color: #a91d1d;
   }
-
+  br {
+    margin-bottom: 16px;
+  }
   .positive {
     color: #32a500;
   }
