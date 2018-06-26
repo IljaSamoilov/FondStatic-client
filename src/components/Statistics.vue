@@ -137,7 +137,6 @@ export default {
   th {
     text-align: right;
   }
-
   .negative {
     color: #a91d1d;
   }

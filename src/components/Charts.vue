@@ -1,10 +1,6 @@
 <template>
   <div>
-    <div v-if="symbol != ''">
-      <p>Hello i am charts</p>
-      <p>{{symbol}}</p>
-    </div>
-    <canvas id="myChart" width="200" height="200"></canvas>
+    <canvas id="myChart" width="400" height="400"></canvas>
   </div>
 </template>
 
@@ -16,7 +12,12 @@
     name: "Charts",
     data() {
       return {
-        allData: []
+        allData: [],
+        colors: {
+          GMF: '#a91d1d',
+          QQQ: '#4267B2',
+          LHVWORLDA: '#32a500'
+        }
         // symbol: ''
       }
     },
@@ -28,64 +29,67 @@
         }
       }
     },
-    created: {
-      // await axios.get('https://fond-data.herokuapp.com/getAllData',
-      //   {
-      //     headers: {
-      //       'Access-Conthol-Allow-Origin': '*',
-      //       'Content-Type': 'application/json',
-      //       'Access-Conthol-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-      //     }
-      //   })
-      //   .then(response => {
-      //     this.allData = response.data
-      //   })
-      //   .catch(error => {
-      //     console.log(error.stack)
-      //   })
+    async created() {
+      await axios.get('https://fond-data.herokuapp.com/getAllData',
+        // {
+        //   headers: {
+        //     'Access-Conthol-Allow-Origin': '*',
+        //     'Content-Type': 'application/json',
+        //     'Access-Conthol-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+        //   }
+        // }
+        )
+        .then(response => {
+          this.allData = response.data
+        })
+        .catch(error => {
+          console.log(error.stack)
+        })
 
     },
     methods: {
-
+      getTimeStamps: function (symbol) {
+        let timeStamps = [];
+        for (let i = 0; i < this.allData.length; i++) {
+          if (this.allData[i].symbol === symbol) {
+            let date = new Date(Date.parse(this.allData[i].timestamp))
+            timeStamps[timeStamps.length] = date.toUTCString().replace(' GMT', '');
+          }
+        }
+        return timeStamps
+      },
+      getMarketPrices: function (symbol) {
+        let marketPrices = [];
+        for (let i = 0; i < this.allData.length; i++) {
+          if (this.allData[i].symbol === symbol) {
+            marketPrices[marketPrices.length] = this.allData[i].exemplarmarketprice;
+          }
+        }
+        return marketPrices
+      }
     },
     watch: {
       symbol: function (val, oldVal) {
         if (val !== '') {
-          var ctx = document.getElementById("myChart");
-          var myChart = new Chart(ctx, {
-            type: 'bar',
+          let ctx = document.getElementById("myChart");
+          let timeStamps = this.getTimeStamps(val);
+          let marketPrices = this.getMarketPrices(val);
+          let color = this.colors[val];
+          let myChart = new Chart(ctx, {
+            type: 'line',
             data: {
-              labels: [oldVal, "Blue", "Yellow", "Green", "Purple", "Orange"],
+              labels: timeStamps,
               datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                  'rgba(255,99,132,1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
+                data: marketPrices,
+                label: val,
+                fill: false,
+                borderColor: color,
+                backgroundColor: color
               }]
             },
             options: {
-              scales: {
-                yAxes: [{
-                  ticks: {
-                    beginAtZero:true
-                  }
-                }]
-              }
+              responsive: true,
+              maintainAspectRatio: false
             }
           });
         }
@@ -95,5 +99,8 @@
 </script>
 
 <style scoped>
-
+  canvas {
+    /*width: 400px !important;*/
+    /*height: 600px !important;*/
+  }
 </style>
