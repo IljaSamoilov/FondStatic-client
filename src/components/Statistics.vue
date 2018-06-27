@@ -49,9 +49,10 @@
 import axios from 'axios'
 import Charts from './Charts'
 // require('materialize-css/dist/css/materialize.css')
-require('materialize-css')
-require('bootstrap')
-
+// require('materialize-css')
+// require('bootstrap')
+import materiliaze from 'materialize-css'
+import bootstrap from 'bootstrap'
 export default {
   name: 'Statistics',
   components: {
