@@ -48,10 +48,11 @@
 <script>
 import axios from 'axios'
 import Charts from './Charts'
-// require('materialize-css/dist/css/materialize.css')
-// require('materialize-css')
+require('materialize-css/dist/css/materialize.css')
+// require('../../node_modules/materialize-css/dist/css/materialize.css')
 // require('bootstrap')
-import materiliaze from 'materialize-css'
+// import materiliaze from 'materialize-css'
+// require('materialize-css')
 import bootstrap from 'bootstrap'
 export default {
   name: 'Statistics',
@@ -132,7 +133,7 @@ export default {
 </script>
 
 <style>
-  @import "materialize-css/dist/css/materialize.css";
+  /*@import "../../node_modules/materialize-css/dist/css/materialize.css";*/
 </style>
 <style scoped>
   th {
