@@ -11,7 +11,7 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
 
-const HOST = process.env.HOST
+const HOST = process.env.HOST || '0.0.0.0'
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 const devWebpackConfig = merge(baseWebpackConfig, {
