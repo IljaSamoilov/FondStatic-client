@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <div class="row">
+      <a class="waves-effect waves-light btn right" v-on:click="updateDatabase()">update database</a>
+    </div>
     <div class="row justify-content-between">
       <div class="col-6"></div>
       <div class="col-6 offset-6">
@@ -14,7 +17,7 @@
             <th>MUUTUS TÄNA</th>
             <th>KASUM</th>
             <th>TURUVÄÄRTUS</th>
-            <th>VIIMANE UUENDUS</th>
+            <th v-if="notMobile">VIIMANE UUENDUS</th>
             <!--<th >OSAKAAL</th>-->
           </tr>
           </thead>
@@ -28,15 +31,19 @@
             <th v-bind:class="isPositive(result.changetoday) ? 'positive' : 'negative'">{{result.changetoday}}%</th>
             <th v-bind:class="isPositive(result.profit) ? 'positive' : 'negative'">{{result.profit}}</th>
             <th>{{result.totalmarketprice}}</th>
-            <th>{{result.timestamp}}</th>
+            <th v-if="notMobile">{{result.timestamp}}</th>
             <!--<th>{{result.part}}</th>-->
           </tr>
           </tbody>
         </table>
-        <span class="right flow-text">Kasum: <span>{{totalprofit.toFixed(2)}}</span></span>
-        <!--<br/>-->
-        <br/>
-        <span class="right flow-text">Varad kokku: <span>{{sum.toFixed(2)}}</span></span>
+        <div class="flow-text">
+          <div class="row">
+            <span class="right">Kasum: <span>{{totalprofit.toFixed(2)}}</span></span>
+          </div>
+          <div class="row">
+            <span class="right">Varad kokku: <span>{{sum.toFixed(2)}}</span></span>
+          </div>
+        </div>
       </div>
     </div>
     <charts :symbol="clickedSymbol"></charts>
@@ -46,90 +53,81 @@
 </template>
 
 <script>
-import axios from 'axios'
-import Charts from './Charts'
-require('materialize-css/dist/css/materialize.css')
-// require('../../node_modules/materialize-css/dist/css/materialize.css')
-// require('bootstrap')
-// import materiliaze from 'materialize-css'
-// require('materialize-css')
-import bootstrap from 'bootstrap'
-export default {
-  name: 'Statistics',
-  components: {
-    Charts
-  },
-  data () {
-    return {
-      results: [],
-      symbols: [],
-      totalprofit: 0,
-      sum: 0,
-      clickedSymbol: ''
-    }
-  },
-  async created () {
-    this.fetchSymbols()
-    // await this.fetchData()
-    // await axios.get('https://cors-anywhere.herokuapp.com/https://fond-data.herokuapp.com/getAllData',
-    //   {
-    //     headers: {
-    //       'Access-Conthol-Allow-Origin': '*',
-    //       'Content-Type': 'application/json',
-    //       'Access-Conthol-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-    //     }
-    //   })
-    //   .then(response => {
-    //     this.results = response.data
-    //   })
-    //   .catch(error => {
-    //     console.log(error.stack)
-    //   })
-  },
-  methods: {
-    async fetchData (symbol) {
-      await axios.get('https://fond-data.herokuapp.com/getLastForSymbol', {
-        params: {
-          symbol: symbol
-        }
-      })
-        .then(response => {
-          this.results.push(response.data)
-          this.totalprofit += response.data.profit
-          this.sum += response.data.totalmarketprice
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-    /** setData (data) {
-      this.results = data
-      console.log(data)
-    } **/
+  import axios from 'axios'
+  import Charts from './Charts'
 
-    isPositive (number) {
-      return number > 0
-    },
+  require('materialize-css/dist/css/materialize.css')
+  import bootstrap from 'bootstrap'
 
-    async fetchSymbols () {
-      await axios.get('https://fond-data.herokuapp.com/getSymbols')
-        .then(response => {
-          this.symbols = response.data
-          for (var i = 0; i < this.symbols.length; i++) {
-            this.fetchData(this.symbols[i])
+  export default {
+    name: 'Statistics',
+    components: {
+      Charts
+    },
+    data() {
+      return {
+        results: [],
+        symbols: [],
+        totalprofit: 0,
+        sum: 0,
+        clickedSymbol: '',
+        notMobile: window.innerWidth >= 1000
+      }
+    },
+    async created() {
+      this.fetchSymbols()
+    },
+    methods: {
+      async fetchData(symbol) {
+        await axios.get('https://fond-data.herokuapp.com/getLastForSymbol', {
+          params: {
+            symbol: symbol
           }
-          // this.symbols.forEach(function(symbol) {
-          //   console.log(symbol)
-          //   this.$parent.fetchData(symbol)
-          // })
         })
-    },
-    clickSymbol (symbol) {
-      this.clickedSymbol = symbol
-    }
-  }
+          .then(response => {
+            this.results.push(response.data)
+            this.totalprofit += response.data.profit
+            this.sum += response.data.totalmarketprice
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      },
 
-}
+      isPositive(number) {
+        return number > 0
+      },
+
+      async fetchSymbols() {
+        this.resetData()
+        await axios.get('https://fond-data.herokuapp.com/getSymbols')
+          .then(response => {
+            this.symbols = response.data
+            for (var i = 0; i < this.symbols.length; i++) {
+              this.fetchData(this.symbols[i])
+            }
+          })
+      },
+      clickSymbol(symbol) {
+        this.clickedSymbol = symbol
+      },
+
+      async updateDatabase() {
+        axios.get('https://fond-data.herokuapp.com/updateDatabase')
+          .then(response => {
+            this.fetchSymbols();
+          })
+      },
+
+      resetData() {
+        this.symbols = []
+        this.results = []
+        this.sum = 0;
+        this.totalprofit = 0
+      }
+    }
+
+  }
 </script>
 
 <style>
@@ -139,12 +137,11 @@ export default {
   th {
     text-align: right;
   }
+
   .negative {
     color: #a91d1d;
   }
-  br {
-    margin-bottom: 16px;
-  }
+
   .positive {
     color: #32a500;
   }
