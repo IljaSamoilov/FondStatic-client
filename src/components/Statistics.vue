@@ -22,7 +22,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="result in results">
+          <tr v-for="result in financeData">
             <th><a href="#" v-on:click="clickSymbol(result.symbol)">{{result.symbol}}</a></th>
             <th>{{result.amount}}</th>
             <th>{{result.exemplarpurchaseprice}}</th>
@@ -38,17 +38,15 @@
         </table>
         <div class="flow-text">
           <div class="row">
-            <span class="right">Kasum: <span>{{totalprofit.toFixed(2)}}</span></span>
+            <span class="right">Kasum: <span>{{results.profit}}</span></span>
           </div>
           <div class="row">
-            <span class="right">Varad kokku: <span>{{sum.toFixed(2)}}</span></span>
+            <span class="right">Varad kokku: <span>{{results.total}}</span></span>
           </div>
         </div>
       </div>
     </div>
     <charts :symbol="clickedSymbol"></charts>
-    <!--<p>{{results[0]}}</p>-->
-    <!--<p>hello</p>-->
   </div>
 </template>
 
@@ -66,12 +64,13 @@
     },
     data() {
       return {
-        results: [],
+        financeData: [],
         symbols: [],
         totalprofit: 0,
         sum: 0,
         clickedSymbol: '',
-        notMobile: window.innerWidth >= 1000
+        notMobile: window.innerWidth >= 1000,
+        results: {}
       }
     },
     async created() {
@@ -85,9 +84,10 @@
           }
         })
           .then(response => {
-            this.results.push(response.data)
+            this.financeData.push(response.data)
             this.totalprofit += response.data.profit
             this.sum += response.data.totalmarketprice
+            this.getResults()
           })
           .catch(error => {
             console.log(error)
@@ -96,6 +96,13 @@
 
       isPositive(number) {
         return number > 0
+      },
+      
+      async getResults() {
+        await axios.get('https://fond-data.herokuapp.com/getLastResults')
+          .then(response => {
+            this.results = response.data
+          })
       },
 
       async fetchSymbols() {
@@ -121,9 +128,10 @@
 
       resetData() {
         this.symbols = []
-        this.results = []
+        this.financeData = []
         this.sum = 0;
         this.totalprofit = 0
+        this.results = {}
       }
     }
 
